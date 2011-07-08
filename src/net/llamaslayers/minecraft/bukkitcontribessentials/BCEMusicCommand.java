@@ -36,13 +36,35 @@ public class BCEMusicCommand implements CommandExecutor {
 		}
 		boolean global = false;
 		int i = 0;
-		if (args[0].equalsIgnoreCase("-global")) {
+		if (args[i].equalsIgnoreCase("-global")) {
 			if (!sender.isOp()) {
 				sender.sendMessage("You are not allowed to play global music.");
 				return true;
 			}
 			global = true;
-			i = 1;
+			i++;
+		}
+		if (args[i].equalsIgnoreCase("-custom")) {
+			i++;
+			if (i >= args.length)
+				return false;
+			try {
+				if (global) {
+					BukkitContrib.getSoundManager().playGlobalCustomMusic(
+							BukkitContribEssentials.instance, args[i], true);
+					return true;
+				} else if (sender instanceof Player) {
+					BukkitContrib.getSoundManager().playCustomMusic(
+							BukkitContribEssentials.instance,
+							ContribCraftPlayer
+									.getContribPlayer((Player) sender),
+							args[i], true);
+					return true;
+				}
+			} catch (UnsupportedOperationException ex) {
+				sender.sendMessage(ex.getMessage());
+				return true;
+			}
 		}
 		StringBuilder sb = new StringBuilder();
 		for (; i < args.length; i++) {
@@ -59,18 +81,14 @@ public class BCEMusicCommand implements CommandExecutor {
 			return false;
 		}
 		if (global) {
-			BukkitContrib.getSoundManager().playGlobalMusic(track);
+			BukkitContrib.getSoundManager().playGlobalMusic(track, 300);
 			return true;
 		} else if (sender instanceof Player) {
-			BukkitContrib
-					.getSoundManager()
-					.playMusic(
-							ContribCraftPlayer
-									.getContribPlayer((Player) sender),
-							track);
+			BukkitContrib.getSoundManager().playMusic(
+					ContribCraftPlayer.getContribPlayer((Player) sender),
+					track, 300);
 			return true;
 		}
 		return false;
 	}
-
 }

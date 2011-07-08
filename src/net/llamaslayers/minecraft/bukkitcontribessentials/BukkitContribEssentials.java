@@ -89,6 +89,8 @@ public class BukkitContribEssentials extends JavaPlugin {
 
 			config.setProperty("player.nightgunner5.cape",
 					"http://llamaslayers.net/cupcape.png");
+			config.setProperty("player.nightgunner5.title",
+					"Nightgunner5\nThe Great");
 
 			config.save();
 		}

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -34,9 +35,10 @@ public class BCEPlayerListener extends PlayerListener {
 		locationCache.put(event.getPlayer().getEntityId(), event.getPlayer()
 				.getLocation());
 
-		doPlayerBasedActions(
-				ContribCraftPlayer.getContribPlayer(event.getPlayer()),
-				BukkitContribEssentials.instance.getConfiguration());
+		Bukkit.getServer()
+				.getScheduler()
+				.scheduleSyncDelayedTask(BukkitContribEssentials.instance,
+						new BCEPlayerTask(event.getPlayer().getName(), this), 1);
 	}
 
 	@Override
@@ -67,11 +69,29 @@ public class BCEPlayerListener extends PlayerListener {
 		}
 	}
 
+	private static class BCEPlayerTask implements Runnable {
+		private final String playerName;
+		private final BCEPlayerListener listener;
+
+		public BCEPlayerTask(String playerName, BCEPlayerListener listener) {
+			this.playerName = playerName;
+			this.listener = listener;
+		}
+
+		public void run() {
+			listener.doPlayerBasedActions(
+					ContribCraftPlayer.getContribPlayer(Bukkit.getServer()
+							.getPlayer(playerName)),
+					BukkitContribEssentials.instance.getConfiguration());
+		}
+	}
+
 	@Override
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
-		doPlayerBasedActions(
-				ContribCraftPlayer.getContribPlayer(event.getPlayer()),
-				BukkitContribEssentials.instance.getConfiguration());
+		Bukkit.getServer()
+				.getScheduler()
+				.scheduleSyncDelayedTask(BukkitContribEssentials.instance,
+						new BCEPlayerTask(event.getPlayer().getName(), this), 1);
 	}
 
 	@Override
