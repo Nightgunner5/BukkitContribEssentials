@@ -1,0 +1,6 @@
+name: BukkitContribEssentials
+main: net.llamaslayers.minecraft.bukkitcontribessentials.BukkitContribEssentials
+version: 0.1
+commands:
+  playmusic:
+    usage: /playmusic [-global] [track]
