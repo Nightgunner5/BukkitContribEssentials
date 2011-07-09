@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -66,10 +67,12 @@ public class BCEPlayerListener extends PlayerListener {
 		}
 
 		public void run() {
-			listener.doPlayerBasedActions(
-					ContribCraftPlayer.getContribPlayer(Bukkit.getServer()
-							.getPlayer(playerName)),
-					BukkitContribEssentials.instance.getConfiguration());
+			Player player = Bukkit.getServer().getPlayer(playerName);
+			if (player != null) {
+				listener.doPlayerBasedActions(
+						ContribCraftPlayer.getContribPlayer(player),
+						BukkitContribEssentials.instance.getConfiguration());
+			}
 		}
 	}
 
@@ -146,6 +149,11 @@ public class BCEPlayerListener extends PlayerListener {
 			try {
 				player.setTexturePack(texturePackUrl);
 			} catch (IllegalArgumentException ex) {
+				BukkitContribEssentials.log
+						.severe("[BukkitContribEssentails] Error with texture pack for world "
+								+ player.getWorld().getName()
+								+ " : "
+								+ ex.getMessage());
 			}
 		}
 	}

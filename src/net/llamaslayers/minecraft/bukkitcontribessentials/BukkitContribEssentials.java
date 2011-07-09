@@ -26,8 +26,8 @@ public class BukkitContribEssentials extends JavaPlugin {
 	protected final static Logger log = Logger
 			.getLogger("Minecraft.BukkitContribEssentials");
 	protected static BukkitContribEssentials instance;
-	protected final BCEPlayerListener playerListener = new BCEPlayerListener();
-	protected final BCEMusicCommand musicCommand = new BCEMusicCommand();
+	protected BCEPlayerListener playerListener;
+	protected BCEMusicCommand musicCommand;
 
 	@Override
 	public void onDisable() {
@@ -48,6 +48,8 @@ public class BukkitContribEssentials extends JavaPlugin {
 				log.warning("[BukkitContribEssentials] Failed to install BukkitContrib, you may have to restart your server or install it manually.");
 			}
 		}
+		playerListener = new BCEPlayerListener();
+		musicCommand = new BCEMusicCommand();
 
 		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener,
 				Event.Priority.Normal, this);
@@ -55,8 +57,6 @@ public class BukkitContribEssentials extends JavaPlugin {
 				Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener,
 				Event.Priority.Normal, this);
-		pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, playerListener,
-				Event.Priority.Monitor, this);
 		pm.registerEvent(Event.Type.PLAYER_RESPAWN, playerListener,
 				Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener,
