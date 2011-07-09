@@ -9,7 +9,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -29,7 +28,7 @@ public class BCEPlayerListener extends PlayerListener {
 
 	@Override
 	public void onPlayerJoin(PlayerJoinEvent event) {
-		doWorldBasedEvents(event.getPlayer().getWorld(),
+		doWorldBasedActions(event.getPlayer().getWorld(),
 				ContribCraftPlayer.getContribPlayer(event.getPlayer()),
 				BukkitContribEssentials.instance.getConfiguration());
 		locationCache.put(event.getPlayer().getEntityId(), event.getPlayer()
@@ -44,7 +43,7 @@ public class BCEPlayerListener extends PlayerListener {
 	@Override
 	public void onPlayerTeleport(PlayerTeleportEvent event) {
 		if (event.getFrom().getWorld() != event.getTo().getWorld()) {
-			doWorldBasedEvents(event.getTo().getWorld(),
+			doWorldBasedActions(event.getTo().getWorld(),
 					ContribCraftPlayer.getContribPlayer(event.getPlayer()),
 					BukkitContribEssentials.instance.getConfiguration());
 		}
@@ -55,18 +54,6 @@ public class BCEPlayerListener extends PlayerListener {
 	@Override
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		playerSentTexturePack.remove(event.getPlayer().getName());
-	}
-
-	@Override
-	public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
-		ContribPlayer player = ContribCraftPlayer.getContribPlayer(event
-				.getPlayer());
-		if (player.isEnabledBukkitContribSinglePlayerMod()
-				&& !playerSentTexturePack.contains(player.getName())) {
-			playerSentTexturePack.add(player.getName());
-			doWorldBasedEvents(player.getWorld(), player,
-					BukkitContribEssentials.instance.getConfiguration());
-		}
 	}
 
 	private static class BCEPlayerTask implements Runnable {
@@ -107,39 +94,42 @@ public class BCEPlayerListener extends PlayerListener {
 		if ((from != to && (from == null || to == null))
 				|| (from != null && to != null && !from.getString("name", "")
 						.equals(to.getString("name")))) {
-			ConfigurationNode region = BukkitContribEssentials.getRegion(event
-					.getTo());
-			if (region != null) {
-				if (region.getString("name", "").length() > 26) {
+
+			if (to != null) {
+				if (to.getString("name", "").length() > 26) {
 					BukkitContribEssentials.log
 							.severe("[BukkitContribEssentials] Region name for "
-									+ region.getString("name", "")
+									+ to.getString("name", "")
 									+ " is too long! Maximum length: 26 characters");
-				} else if (region.getString("description", "").length() > 26) {
+				} else if (to.getString("description", "").length() > 26) {
 					BukkitContribEssentials.log
 							.severe("[BukkitContribEssentials] Region description for "
-									+ region.getString("name", "")
+									+ to.getString("name", "")
 									+ " is too long! Maximum length: 26 characters");
 				} else {
 					try {
-						player.sendNotification(region.getString("name", ""),
-								region.getString("description", ""),
-								Material.valueOf(region.getString("icon", "")));
+						player.sendNotification(to.getString("name", ""),
+								to.getString("description", ""),
+								Material.valueOf(to.getString("icon", "")));
 					} catch (IllegalArgumentException ex) {
 						BukkitContribEssentials.log
 								.severe("[BukkitContribEssentials] Region icon for "
-										+ region.getString("name", "")
+										+ to.getString("name", "")
 										+ " is invalid.");
 					}
 				}
-				if (region.getString("music") != null) {
+				if (from.getString("music") != null) {
+					BukkitContrib.getSoundManager().stopMusic(player, false,
+							2000);
+				}
+				if (to.getString("music") != null) {
 					try {
 						BukkitContrib.getSoundManager().playMusic(player,
-								Music.valueOf(region.getString("music")));
+								Music.valueOf(to.getString("music")));
 					} catch (IllegalArgumentException ex) {
 						BukkitContribEssentials.log
 								.severe("[BukkitContribEssentials] Region music for "
-										+ region.getString("name", "")
+										+ to.getString("name", "")
 										+ " is invalid.");
 					}
 				}
@@ -147,7 +137,7 @@ public class BCEPlayerListener extends PlayerListener {
 		}
 	}
 
-	private void doWorldBasedEvents(World world, ContribPlayer player,
+	protected void doWorldBasedActions(World world, ContribPlayer player,
 			Configuration config) {
 		String texturePackUrl = config.getString(
 				"texturepack." + world.getName(),
@@ -160,7 +150,8 @@ public class BCEPlayerListener extends PlayerListener {
 		}
 	}
 
-	private void doPlayerBasedActions(ContribPlayer player, Configuration config) {
+	protected void doPlayerBasedActions(ContribPlayer player,
+			Configuration config) {
 		if (config.getString("player." + player.getName() + ".cape") != null) {
 			BukkitContrib.getAppearanceManager().setGlobalCloak(player,
 					config.getString("player." + player.getName() + ".cape"));

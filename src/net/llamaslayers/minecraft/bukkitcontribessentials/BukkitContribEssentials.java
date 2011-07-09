@@ -1,5 +1,12 @@
 package net.llamaslayers.minecraft.bukkitcontribessentials;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,11 +14,13 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.bukkit.Location;
+import org.bukkit.event.CustomEventListener;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
 import org.bukkit.util.config.ConfigurationNode;
+import org.bukkitcontrib.event.bukkitcontrib.BukkitContribSPEnable;
 
 public class BukkitContribEssentials extends JavaPlugin {
 	protected final static Logger log = Logger
@@ -22,13 +31,24 @@ public class BukkitContribEssentials extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-
 	}
 
 	@Override
 	public void onEnable() {
 		instance = this;
 		PluginManager pm = getServer().getPluginManager();
+
+		if (pm.getPlugin("BukkitContrib") == null) {
+			try {
+				download(log, new URL("http://bit.ly/autoupdateBukkitContrib"),
+						new File("plugins/BukkitContrib.jar"));
+				pm.loadPlugin(new File("plugins/BukkitContrib.jar"));
+				pm.enablePlugin(pm.getPlugin("BukkitContrib"));
+			} catch (Exception ex) {
+				log.warning("[BukkitContribEssentials] Failed to install BukkitContrib, you may have to restart your server or install it manually.");
+			}
+		}
+
 		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener,
 				Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_TELEPORT, playerListener,
@@ -41,6 +61,16 @@ public class BukkitContribEssentials extends JavaPlugin {
 				Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener,
 				Event.Priority.Normal, this);
+		pm.registerEvent(Event.Type.CUSTOM_EVENT, new CustomEventListener() {
+			@Override
+			public void onCustomEvent(Event _event) {
+				if (_event instanceof BukkitContribSPEnable) {
+					BukkitContribSPEnable event = (BukkitContribSPEnable) _event;
+					playerListener.doWorldBasedActions(event.getPlayer()
+							.getWorld(), event.getPlayer(), getConfiguration());
+				}
+			}
+		}, Event.Priority.Normal, this);
 
 		getCommand("playmusic").setExecutor(musicCommand);
 
@@ -114,5 +144,38 @@ public class BukkitContribEssentials extends JavaPlugin {
 				return region;
 		}
 		return null;
+	}
+
+	// http://forums.bukkit.org/threads/dev-bukkitcontrib-alpha-0-1-3-953.18192/page-36#post-457314
+	public static void download(Logger log, URL url, File file)
+			throws IOException {
+		if (!file.getParentFile().exists()) {
+			file.getParentFile().mkdir();
+		}
+		if (file.exists()) {
+			file.delete();
+		}
+		file.createNewFile();
+		final int size = url.openConnection().getContentLength();
+		log.info("Downloading " + file.getName() + " (" + size / 1024
+				+ "kb) ...");
+		final InputStream in = url.openStream();
+		final OutputStream out = new BufferedOutputStream(new FileOutputStream(
+				file));
+		final byte[] buffer = new byte[1024];
+		int len, downloaded = 0, msgs = 0;
+		final long start = System.currentTimeMillis();
+		while ((len = in.read(buffer)) >= 0) {
+			out.write(buffer, 0, len);
+			downloaded += len;
+			if ((int) ((System.currentTimeMillis() - start) / 500) > msgs) {
+				log.info((int) ((double) downloaded / (double) size * 100d)
+						+ "%");
+				msgs++;
+			}
+		}
+		in.close();
+		out.close();
+		log.info("Download finished");
 	}
 }
