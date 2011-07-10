@@ -121,7 +121,7 @@ public class BCEPlayerListener extends PlayerListener {
 										+ " is invalid.");
 					}
 				}
-				if (from.getString("music") != null) {
+				if (from != null && from.getString("music") != null) {
 					BukkitContrib.getSoundManager().stopMusic(player, false,
 							2000);
 				}
