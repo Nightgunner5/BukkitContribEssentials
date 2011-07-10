@@ -130,10 +130,21 @@ public class BCEPlayerListener extends PlayerListener {
 						BukkitContrib.getSoundManager().playMusic(player,
 								Music.valueOf(to.getString("music")));
 					} catch (IllegalArgumentException ex) {
-						BukkitContribEssentials.log
-								.severe("[BukkitContribEssentials] Region music for "
-										+ to.getString("name", "")
-										+ " is invalid.");
+						try {
+							BukkitContrib.getSoundManager().playCustomMusic(
+									BukkitContribEssentials.instance, player,
+									to.getString("music"), false);
+						} catch (UnsupportedOperationException ex1) {
+							BukkitContribEssentials.log
+									.severe("[BukkitContribEssentials] Region music for "
+											+ to.getString("name", "")
+											+ " is invalid.");
+							if (to.getString("music").startsWith("http")) {
+								BukkitContribEssentials.log
+										.severe("[BukkitContribEssentials] "
+												+ ex1.getMessage());
+							}
+						}
 					}
 				}
 			}
