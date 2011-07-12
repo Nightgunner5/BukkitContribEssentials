@@ -1,6 +1,6 @@
 name: BukkitContribEssentials
 main: net.llamaslayers.minecraft.bukkitcontribessentials.BukkitContribEssentials
-version: 0.1.2
+version: 0.1.3
 description: Textures, capes, music, notifications, and more!
 author: Nightgunner5
 authors:
@@ -11,3 +11,7 @@ website: http://forums.bukkit.org/threads/25399/
 commands:
     playmusic:
         usage: /playmusic [-global] [-custom] [track]
+    bukkitcontribessentials:
+        aliases:
+            - bce
+        usage: /bukkitcontribessentials <reload|version>

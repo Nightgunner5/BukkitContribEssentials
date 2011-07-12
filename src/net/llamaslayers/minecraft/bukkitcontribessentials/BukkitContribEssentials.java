@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.event.CustomEventListener;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginManager;
@@ -21,6 +23,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
 import org.bukkit.util.config.ConfigurationNode;
 import org.bukkitcontrib.event.bukkitcontrib.BukkitContribSPEnable;
+import org.bukkitcontrib.player.ContribCraftPlayer;
 
 public class BukkitContribEssentials extends JavaPlugin {
 	protected final static Logger log = Logger
@@ -28,6 +31,7 @@ public class BukkitContribEssentials extends JavaPlugin {
 	protected static BukkitContribEssentials instance;
 	protected BCEPlayerListener playerListener;
 	protected BCEMusicCommand musicCommand;
+	protected BCECommand masterCommand;
 
 	@Override
 	public void onDisable() {
@@ -50,6 +54,7 @@ public class BukkitContribEssentials extends JavaPlugin {
 		}
 		playerListener = new BCEPlayerListener();
 		musicCommand = new BCEMusicCommand();
+		masterCommand = new BCECommand();
 
 		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener,
 				Event.Priority.Normal, this);
@@ -73,6 +78,7 @@ public class BukkitContribEssentials extends JavaPlugin {
 		}, Event.Priority.Normal, this);
 
 		getCommand("playmusic").setExecutor(musicCommand);
+		getCommand("bukkitcontribessentials").setExecutor(masterCommand);
 
 		if (getConfiguration().getKeys().isEmpty()) {
 			Configuration config = getConfiguration();
@@ -123,6 +129,19 @@ public class BukkitContribEssentials extends JavaPlugin {
 					"Nightgunner5\nThe Great");
 
 			config.save();
+		}
+
+		// If any players joined before this plugin was started
+		// (eg. if the /reload command is used):
+		for (World world : getServer().getWorlds()) {
+			for (Player player : world.getPlayers()) {
+				playerListener.doPlayerBasedActions(
+						ContribCraftPlayer.getContribPlayer(player),
+						getConfiguration());
+				playerListener.doWorldBasedActions(world,
+						ContribCraftPlayer.getContribPlayer(player),
+						getConfiguration());
+			}
 		}
 	}
 
