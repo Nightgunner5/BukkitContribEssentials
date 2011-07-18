@@ -8,6 +8,9 @@ import org.bukkitcontrib.BukkitContrib;
 import org.bukkitcontrib.player.ContribCraftPlayer;
 import org.bukkitcontrib.sound.Music;
 
+/**
+ * @author Nightgunner5
+ */
 public class BCEMusicCommand implements CommandExecutor {
 	private static final String trackList;
 	static {
@@ -27,9 +30,12 @@ public class BCEMusicCommand implements CommandExecutor {
 		trackList = sb.toString();
 	}
 
-	@Override
+	/**
+	 * @see org.bukkit.command.CommandExecutor#onCommand(org.bukkit.command.CommandSender,
+	 *      org.bukkit.command.Command, java.lang.String, java.lang.String[])
+	 */
 	public boolean onCommand(CommandSender sender, Command command,
-			String label, String[] args) {
+		String label, String[] args) {
 		if (args.length == 0) {
 			sender.sendMessage("Available tracks:" + trackList);
 			return true;

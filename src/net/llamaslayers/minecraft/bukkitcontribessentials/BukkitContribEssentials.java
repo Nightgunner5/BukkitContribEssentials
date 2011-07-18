@@ -1,11 +1,6 @@
 package net.llamaslayers.minecraft.bukkitcontribessentials;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,6 +20,9 @@ import org.bukkit.util.config.ConfigurationNode;
 import org.bukkitcontrib.event.bukkitcontrib.BukkitContribSPEnable;
 import org.bukkitcontrib.player.ContribCraftPlayer;
 
+/**
+ * @author Nightgunner5
+ */
 public class BukkitContribEssentials extends JavaPlugin {
 	protected final static Logger log = Logger
 			.getLogger("Minecraft.BukkitContribEssentials");
@@ -33,11 +31,9 @@ public class BukkitContribEssentials extends JavaPlugin {
 	protected BCEMusicCommand musicCommand;
 	protected BCECommand masterCommand;
 
-	@Override
 	public void onDisable() {
 	}
 
-	@Override
 	public void onEnable() {
 		instance = this;
 		PluginManager pm = getServer().getPluginManager();
@@ -145,6 +141,12 @@ public class BukkitContribEssentials extends JavaPlugin {
 		}
 	}
 
+	/**
+	 * @param location
+	 *            The location with which to look for a containing region
+	 * @return The configuration node where the region was defined, or null if
+	 *         no region was applicable
+	 */
 	public static ConfigurationNode getRegion(Location location) {
 		List<ConfigurationNode> regions = instance.getConfiguration()
 				.getNodeList("regions." + location.getWorld().getName(), null);
@@ -165,9 +167,21 @@ public class BukkitContribEssentials extends JavaPlugin {
 		return null;
 	}
 
-	// http://forums.bukkit.org/threads/dev-bukkitcontrib-alpha-0-1-3-953.18192/page-36#post-457314
+	/**
+	 * Download a file. Code is from
+	 * {@link "http://forums.bukkit.org/threads/dev-bukkitcontrib-alpha-0-1-3-953.18192/page-36#post-457314"}
+	 * 
+	 * @param log
+	 *            Logger to use for progress information
+	 * @param url
+	 *            URL to download
+	 * @param file
+	 *            File to write contents of URL to
+	 * @throws IOException
+	 *             If an error occurred during compilation
+	 */
 	public static void download(Logger log, URL url, File file)
-			throws IOException {
+		throws IOException {
 		if (!file.getParentFile().exists()) {
 			file.getParentFile().mkdir();
 		}

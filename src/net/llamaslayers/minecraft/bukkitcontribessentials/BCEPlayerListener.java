@@ -10,12 +10,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerListener;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.util.config.Configuration;
 import org.bukkit.util.config.ConfigurationNode;
 import org.bukkitcontrib.BukkitContrib;
@@ -23,10 +18,16 @@ import org.bukkitcontrib.player.ContribCraftPlayer;
 import org.bukkitcontrib.player.ContribPlayer;
 import org.bukkitcontrib.sound.Music;
 
+/**
+ * @author Nightgunner5
+ */
 public class BCEPlayerListener extends PlayerListener {
 	private final Map<Integer, Location> locationCache = new HashMap<Integer, Location>();
 	private final Set<String> playerSentTexturePack = new HashSet<String>();
 
+	/**
+	 * @see org.bukkit.event.player.PlayerListener#onPlayerJoin(org.bukkit.event.player.PlayerJoinEvent)
+	 */
 	@Override
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		doWorldBasedActions(event.getPlayer().getWorld(),
@@ -41,6 +42,9 @@ public class BCEPlayerListener extends PlayerListener {
 						new BCEPlayerTask(event.getPlayer().getName(), this), 1);
 	}
 
+	/**
+	 * @see org.bukkit.event.player.PlayerListener#onPlayerTeleport(org.bukkit.event.player.PlayerTeleportEvent)
+	 */
 	@Override
 	public void onPlayerTeleport(PlayerTeleportEvent event) {
 		if (event.getFrom().getWorld() != event.getTo().getWorld()) {
@@ -52,6 +56,9 @@ public class BCEPlayerListener extends PlayerListener {
 				.getLocation());
 	}
 
+	/**
+	 * @see org.bukkit.event.player.PlayerListener#onPlayerQuit(org.bukkit.event.player.PlayerQuitEvent)
+	 */
 	@Override
 	public void onPlayerQuit(PlayerQuitEvent event) {
 		playerSentTexturePack.remove(event.getPlayer().getName());
@@ -76,6 +83,9 @@ public class BCEPlayerListener extends PlayerListener {
 		}
 	}
 
+	/**
+	 * @see org.bukkit.event.player.PlayerListener#onPlayerRespawn(org.bukkit.event.player.PlayerRespawnEvent)
+	 */
 	@Override
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
 		Bukkit.getServer()
@@ -84,6 +94,9 @@ public class BCEPlayerListener extends PlayerListener {
 						new BCEPlayerTask(event.getPlayer().getName(), this), 1);
 	}
 
+	/**
+	 * @see org.bukkit.event.player.PlayerListener#onPlayerMove(org.bukkit.event.player.PlayerMoveEvent)
+	 */
 	@Override
 	public void onPlayerMove(PlayerMoveEvent event) {
 		ContribPlayer player = ContribCraftPlayer.getContribPlayer(event
@@ -152,7 +165,7 @@ public class BCEPlayerListener extends PlayerListener {
 	}
 
 	protected void doWorldBasedActions(World world, ContribPlayer player,
-			Configuration config) {
+		Configuration config) {
 		String texturePackUrl = config.getString(
 				"texturepack." + world.getName(),
 				config.getString("texturepack.default"));
@@ -170,7 +183,7 @@ public class BCEPlayerListener extends PlayerListener {
 	}
 
 	protected void doPlayerBasedActions(ContribPlayer player,
-			Configuration config) {
+		Configuration config) {
 		if (config.getString("player." + player.getName() + ".cape") != null) {
 			BukkitContrib.getAppearanceManager().setGlobalCloak(player,
 					config.getString("player." + player.getName() + ".cape"));

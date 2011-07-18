@@ -5,10 +5,16 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
+/**
+ * @author Nightgunner5
+ */
 public class BCECommand implements CommandExecutor {
-	@Override
+	/**
+	 * @see org.bukkit.command.CommandExecutor#onCommand(org.bukkit.command.CommandSender,
+	 *      org.bukkit.command.Command, java.lang.String, java.lang.String[])
+	 */
 	public boolean onCommand(CommandSender sender, Command command,
-			String label, String[] args) {
+		String label, String[] args) {
 		if (!sender.isOp()) {
 			sender.sendMessage("You are not allowed to use this command.");
 			return true;
